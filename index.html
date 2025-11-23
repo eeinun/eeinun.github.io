@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Intent Link Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            margin: 20px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #cc0000;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 4px;
+            display: none;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            border-radius: 4px;
+        }
+        .info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .info ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .info li {
+            color: #555;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>YouTube Intent Link Generator</h1>
+        
+        <div class="input-group">
+            <label for="youtubeUrl">Enter YouTube URL:</label>
+            <input type="text" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+        </div>
+        
+        <button onclick="openIntent()">Open in App</button>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="info">
+            <h3>Supported URL Formats:</h3>
+            <ul>
+                <li>https://www.youtube.com/watch?v=VIDEO_ID</li>
+                <li>https://youtu.be/VIDEO_ID</li>
+                <li>https://m.youtube.com/watch?v=VIDEO_ID</li>
+                <li>https://youtube.com/watch?v=VIDEO_ID</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function extractVideoId(url) {
+            // Remove whitespace
+            url = url.trim();
+            
+            // Regular expressions for different YouTube URL formats
+            const patterns = [
+                // Standard youtube.com/watch?v=VIDEO_ID
+                /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+                // Short youtu.be/VIDEO_ID
+                /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+                // Mobile m.youtube.com/watch?v=VIDEO_ID
+                /(?:m\.youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+                // With additional parameters
+                /(?:youtube\.com\/watch\?.*v=)([a-zA-Z0-9_-]{11})/,
+                // Embed format
+                /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/
+            ];
+            
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match && match[1]) {
+                    return match[1];
+                }
+            }
+            
+            return null;
+        }
+        
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
+            
+            // Hide message after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        function openIntent() {
+            const urlInput = document.getElementById('youtubeUrl');
+            const youtubeUrl = urlInput.value;
+            
+            if (!youtubeUrl) {
+                showMessage('Please enter a YouTube URL', 'error');
+                return;
+            }
+            
+            const videoId = extractVideoId(youtubeUrl);
+            
+            if (!videoId) {
+                showMessage('Invalid YouTube URL. Please check the format and try again.', 'error');
+                return;
+            }
+            
+            // Create the intent URL as specified in the requirements
+            const intentUrl = `intent://m.youtube.com/watch?v=${videoId}`;
+            
+            showMessage(`Opening video: ${videoId}`, 'success');
+            
+            // Open the intent URL
+            window.location.href = intentUrl;
+        }
+        
+        // Allow pressing Enter to submit
+        document.getElementById('youtubeUrl').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                openIntent();
+            }
+        });
+    </script>
+</body>
+</html>
