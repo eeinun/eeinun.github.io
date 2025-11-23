@@ -4,27 +4,12 @@
     <meta charset="UTF-8">
     <title>리다이렉트 중...</title>
     <script>
-        const urlList = {
-            "myblog": "https://velog.io/@내아이디",
-            "insta": "https://instagram.com/내아이디"
-        };
-
         function redirect() {
             const params = new URLSearchParams(window.location.search);
             let key = params.get('q');
-
-            // 파라미터가 없으면 경로(/something)에서 추출 (404 트릭용)
-            if (!key) {
-                key = window.location.pathname.substring(1);
-            }
-
-            // 1. 등록된 키워드인지 확인 (예: q=myblog)
-            if (urlList[key]) {
-                window.location.href = urlList[key];
-            } 
             // 2. 입력값이 http로 시작하는 URL인지 확인 (예: q=https://naver.com)
-            else if (key.startsWith('http://') || key.startsWith('https://')) {
-                window.location.href = key;
+            if (key.startsWith('http://') || key.startsWith('https://')) {
+                window.location.href = `intent://${key.replace("http://","").replace("https://","")}`;
             } 
             else {
                 document.body.innerHTML = "<h1>유효하지 않은 링크입니다.</h1>";
