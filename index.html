@@ -1,78 +1,10 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>리다이렉트 중...</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <script>
-        function showMessage(msg) {
-            document.body.innerHTML = "<h1>" + msg + "</h1>";
-        }
+<script>
+    // 1. 주소창의 ?q= 값(URL)을 가져옵니다.
+    const target = new URLSearchParams(location.search).get('q');
 
-        function buildIntentURI(urlObj, packageName) {
-            // urlObj: instance of URL
-            // packageName: optional Android package name (e.g. com.example.app)
-            const hostAndPath = urlObj.host + urlObj.pathname + urlObj.search + urlObj.hash;
-            const scheme = urlObj.protocol.replace(':', '');
-            // If packageName is not provided, omit it — many browsers expect at least scheme; but behavior varies.
-            let intent = `intent://${hostAndPath}#Intent;scheme=${scheme};`;
-            if (packageName) intent += `package=${packageName};`;
-            intent += "end";
-            return intent;
-        }
-
-        function redirect() {
-            const params = new URLSearchParams(window.location.search);
-            const raw = params.get('q');
-            if (!raw) {
-                showMessage("유효하지 않은 링크입니다. (q 파라미터 없음)");
-                return;
-            }
-
-            let decoded;
-            try {
-                decoded = decodeURIComponent(raw.trim());
-            } catch (e) {
-                decoded = raw.trim();
-            }
-
-            // 기본 안전 검사: URL 생성 시도
-            let url;
-            try {
-                url = new URL(decoded);
-            } catch (e) {
-                showMessage("유효하지 않은 URL입니다.");
-                return;
-            }
-
-            if (url.protocol !== "http:" && url.protocol !== "https:") {
-                showMessage("지원하지 않는 프로토콜입니다.");
-                return;
-            }
-
-            // 보안 권장: 도메인 화이트리스트가 있는 경우 여기서 검사
-            // 예: const allowed = ["example.com","naver.com"]; if (!allowed.includes(url.hostname)) { ... }
-
-            // 플랫폼 판단: Android에서 앱 인텐트를 시도하려면 package 파라미터를 추가로 요구하는 것이 안전함.
-            const isAndroid = /Android/i.test(navigator.userAgent);
-            const packageParam = params.get('package'); // optional: com.example.app
-
-            if (isAndroid && packageParam) {
-                // Android + package: 시도해볼 intent:// URI
-                const intentURI = buildIntentURI(url, packageParam);
-                // intent 시도; 실패 시(브라우저가 intent를 지원하지 않으면) 폴백으로 http 이동
-                // location.replace 사용하여 히스토리 남기지 않음
-                location.replace(intentURI);
-                // 폴백: 일부 브라우저는 intent를 지원하지 않아 아무 일도 일어나지 않을 수 있음.
-                // 추가적인 폴백 로직(타이머 후 http로 대체)도 가능.
-            } else {
-                // 기본 동작: 그냥 http/https로 이동
-                location.replace(url.href);
-            }
-        }
-    </script>
-</head>
-<body onload="redirect()">
-    <p>이동 중...</p>
-</body>
-</html>
+    // 2. 값이 있다면 https를 intent로 글자만 바꿔서 즉시 이동합니다.
+    if (target) {
+        location.href = target.replace('https://', 'intent://');
+    }
+</script>
