@@ -5,7 +5,7 @@
 
     // 2. 값이 있다면 https를 intent로 글자만 바꿔서 즉시 이동합니다.
     if (target) {
-        if (target.includes("youtube")) {
+        if (target.includes("youtu")) {
             location.href = target.replace('https://', 'intent://') + "&app=desktop#Intent;package=com.google.android.youtube;scheme=vnd.youtube;end"
         }
         else if (target.includes("spotify")) {
