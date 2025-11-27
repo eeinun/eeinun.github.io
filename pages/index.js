@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useEffect } from 'react';
 
 // 1. 서버 사이드 로직 (Server Side Rendering)
-// 브라우저보다 먼저 실행됩니다. 여기서 YouTube 정보를 가져와 HTML을 완성합니다.
+// 브라우저보다 먼저 실행됩니다. 여기서 YouTube 및 Spotify 정보를 가져와 HTML을 완성합니다.
 export async function getServerSideProps(context) {
   const { q } = context.query; // URL에서 ?q= 값을 가져옴
   
@@ -14,24 +14,38 @@ export async function getServerSideProps(context) {
     url: q || ""
   };
 
-  // q 값이 있고, 유튜브 링크라면 oEmbed 데이터를 가져옴
-  if (q && q.includes("youtu")) {
-    try {
-      // YouTube oEmbed API 호출
-      const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(q)}&format=json`;
-      const res = await fetch(oembedUrl);
-      
-      if (res.ok) {
-        const data = await res.json();
-        // 받아온 데이터로 메타 태그 덮어쓰기
-        metaData.title = data.title;
-        metaData.description = `YouTube · ${data.author_name}`;
-        metaData.image = data.thumbnail_url;
+  try {
+    if (q) {
+      // 1) YouTube 처리
+      if (q.includes("youtu")) {
+        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(q)}&format=json`;
+        const res = await fetch(oembedUrl);
+        
+        if (res.ok) {
+          const data = await res.json();
+          metaData.title = data.title;
+          metaData.description = `YouTube · ${data.author_name}`;
+          metaData.image = data.thumbnail_url;
+        }
       }
-    } catch (e) {
-      console.error("YouTube Fetch Error:", e);
-      // 에러 나면 그냥 기본값 유지
+      // 2) Spotify 처리 (추가됨)
+      else if (q.includes("spotify")) {
+        // Spotify oEmbed API 엔드포인트
+        const oembedUrl = `https://open.spotify.com/oembed?url=${encodeURIComponent(q)}`;
+        const res = await fetch(oembedUrl);
+
+        if (res.ok) {
+          const data = await res.json();
+          // Spotify 데이터 매핑
+          metaData.title = data.title; // 예: "Song Name - Artist"
+          metaData.description = `Spotify · ${data.provider_name || 'Music'}`;
+          metaData.image = data.thumbnail_url;
+        }
+      }
     }
+  } catch (e) {
+    console.error("Fetch Error:", e);
+    // 에러 발생 시 기본값 유지
   }
 
   // 완성된 데이터를 페이지 컴포넌트로 전달
