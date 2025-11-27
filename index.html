@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 <script>
+    function append_meta(name, content) {
+        const meta = document.createElement("meta");
+        meta.name = name;
+        meta.content = content;
+        document.head.appendChild(meta);
+    }
     // 1. 주소창의 ?q= 값(URL)을 가져옵니다.
     const target = new URLSearchParams(location.search).get('q');
 
     // 2. 값이 있다면 https를 intent로 글자만 바꿔서 즉시 이동합니다.
     if (target) {
         if (target.includes("youtu")) {
+            const data = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/oembed?url=${target}&format=json`).json();
+            append_meta(name="title", content=data.title);
+            append_meta(name="description", content=data.author_name);
+            append_meta(name="og:title", content=data.title);
+            append_meta(name="og:description", content=data.author_name);
+            append_meta(name="og:image", content=data.thumbnail_url);
             location.href = target.replace('https://', 'intent://').split("?")[0] + "&app=desktop#Intent;package=com.google.android.youtube;scheme=vnd.youtube;end"
         }
         else if (target.includes("spotify")) {
