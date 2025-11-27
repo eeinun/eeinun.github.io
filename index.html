@@ -18,7 +18,6 @@
             append_meta(name="og:title", content=data.title);
             append_meta(name="og:description", content=data.author_name);
             append_meta(name="og:image", content=data.thumbnail_url);
-            location.href = target.replace('https://', 'intent://').split("?")[0] + "&app=desktop#Intent;package=com.google.android.youtube;scheme=vnd.youtube;end"
         }
         else if (target.includes("spotify")) {
             location.href = "https://spotify.app.link/?product=open&$full_url=" + target
