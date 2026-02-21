@@ -42,6 +42,13 @@ export async function getServerSideProps(context) {
           metaData.image = data.thumbnail_url;
         }
       }
+      // 3) nicovideo 처리
+      else if (q.includes("nicovideo")) {
+        const video_id = q.split("/").pop().split("?")[0];
+        metaData.title = `ニコニコ動画 - ${video_id}`;
+        metaData.description = "ニコニコ動画で視聴";
+        // nicovideo는 oEmbed API가 없으므로 기본 정보만 표시
+      }
     }
   } catch (e) {
     console.error("Fetch Error:", e);
@@ -71,6 +78,10 @@ export default function Home({ metaData, targetUrl }) {
     }
     else if (target.includes("spotify")) {
         window.location.href = "https://spotify.app.link/?product=open&$full_url=" + target;
+    }
+    else if (target.includes("nicovideo")) {
+        const video_id = target.split("/").pop().split("?")[0];
+        window.location.href = `intent://video/${video_id}#Intent;scheme=nicovideo;package=jp.nicovideo.android;end`;
     }
     // 그 외의 경우 (선택 사항: 그냥 해당 링크로 이동)
     else {
