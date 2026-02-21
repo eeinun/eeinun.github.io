@@ -81,7 +81,7 @@ export default function Home({ metaData, targetUrl }) {
     }
     else if (target.includes("nicovideo")) {
         const video_id = target.split("/").pop().split("?")[0];
-        window.location.href = `intent://video/${video_id}#Intent;scheme=nicovideo;package=jp.nicovideo.android;end`;
+        targetUrl = `intent://video/${video_id}#Intent;scheme=nicovideo;package=jp.nicovideo.android;end`;
     }
     // 그 외의 경우 (선택 사항: 그냥 해당 링크로 이동)
     else {
