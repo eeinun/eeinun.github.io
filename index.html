@@ -12,9 +12,12 @@
             location.href = "https://spotify.app.link/?product=open&$full_url=" + target
         }
         else if (target.includes("nicovideo")) {
-            location.href = encodeURIComponent(`https://nicovideo.applink.nicovideo.jp/?link=https://sp.nicovideo.jp/force-app-link/watch/${videoId}&apn=jp.nicovideo.android&ibi=jp.co.dwango.nicoplayer&isi=307764057`;
+            const videoId = target.split('/').pop().split('?')[0]; 
+            const targetLink = encodeURIComponent(`https://sp.nicovideo.jp/force-app-link/watch/${videoId}`);
+            location.href = `https://nicovideo.applink.nicovideo.jp/?link=${targetLink}&apn=jp.nicovideo.android&ibi=jp.co.dwango.nicoplayer&isi=307764057`;
         }
     }
+
     console.log(appLink);
 
     }
