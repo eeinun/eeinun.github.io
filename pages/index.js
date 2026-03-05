@@ -6,27 +6,33 @@ import { useEffect } from 'react';
 export async function getServerSideProps(context) {
   const { q } = context.query; // URL에서 ?q= 값을 가져옴
 
-  baseUrl = q.split("?")[0];
-  queryParams = ( q.split("?")[1] || "" ).split("&").reduce((acc, param) => {
-    const [key, value] = param.split("=");
-    if (key) acc[key] = value;
-    return acc;
-  } , {});
-  q = baseUrl + "?v=" + queryParams.v;
-  
   // 기본 메타 태그 설정
   let metaData = {
     title: "리다이렉트 페이지",
     description: "잠시 후 이동합니다...",
-    image: "", // 기본 이미지 URL이 있다면 여기에 넣으세요
+    image: "",
     url: q || ""
   };
 
+  // URL 재구성 (v 파라미터만 유지 - intent 동작을 위해 필요)
+  let processedUrl = q;
+  if (q) {
+    const baseUrl = q.split("?")[0];
+    const queryParams = ( q.split("?")[1] || "" ).split("&").reduce((acc, param) => {
+      const [key, value] = param.split("=");
+      if (key) acc[key] = value;
+      return acc;
+    }, {});
+    if (queryParams.v) {
+      processedUrl = baseUrl + "?v=" + queryParams.v;
+    }
+  }
+
   try {
-    if (q) {
+    if (processedUrl) {
       // 1) YouTube 처리
-      if (q.includes("youtu")) {
-        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(q)}&format=json`;
+      if (processedUrl.includes("youtu")) {
+        const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(processedUrl)}&format=json`;
         const res = await fetch(oembedUrl);
         
         if (res.ok) {
@@ -37,9 +43,9 @@ export async function getServerSideProps(context) {
         }
       }
       // 2) Spotify 처리 (추가됨)
-      else if (q.includes("spotify")) {
+      else if (processedUrl.includes("spotify")) {
         // Spotify oEmbed API 엔드포인트
-        const oembedUrl = `https://open.spotify.com/oembed?url=${encodeURIComponent(q)}`;
+        const oembedUrl = `https://open.spotify.com/oembed?url=${encodeURIComponent(processedUrl)}`;
         const res = await fetch(oembedUrl);
 
         if (res.ok) {
@@ -51,8 +57,8 @@ export async function getServerSideProps(context) {
         }
       }
       // 3) nicovideo 처리
-      else if (q.includes("nicovideo")) {
-        const video_id = q.split("/").pop().split("?")[0];
+      else if (processedUrl.includes("nicovideo")) {
+        const video_id = processedUrl.split("/").pop().split("?")[0];
         metaData.title = `ニコニコ動画 - ${video_id}`;
         metaData.description = "ニコニコ動画で視聴";
         // nicovideo는 oEmbed API가 없으므로 기본 정보만 표시
@@ -65,7 +71,7 @@ export async function getServerSideProps(context) {
 
   // 완성된 데이터를 페이지 컴포넌트로 전달
   return {
-    props: { metaData, targetUrl: q || null },
+    props: { metaData, targetUrl: processedUrl || null },
   };
 }
 
