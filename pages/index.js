@@ -84,7 +84,7 @@ export default function Home({ metaData, targetUrl }) {
     // 기존 리다이렉트 로직 그대로 복사
     if (target.includes("youtu")) {
         // 안드로이드 인텐트 스킴 처리
-        window.location.href = target.replace('https://', 'intent://').split("?")[0] + "&app=desktop#Intent;package=com.google.android.youtube;scheme=vnd.youtube;end";
+        window.location.href = target.replace('https://', 'intent://') + "&app=desktop#Intent;package=com.google.android.youtube;scheme=vnd.youtube;end";
     }
     else if (target.includes("spotify")) {
         window.location.href = "https://spotify.app.link/?product=open&$full_url=" + target;
