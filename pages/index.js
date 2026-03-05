@@ -4,28 +4,24 @@ import { useEffect } from 'react';
 // 1. 서버 사이드 로직 (Server Side Rendering)
 // 브라우저보다 먼저 실행됩니다. 여기서 YouTube 및 Spotify 정보를 가져와 HTML을 완성합니다.
 export async function getServerSideProps(context) {
-  const { q } = context.query; // URL에서 ?q= 값을 가져옴
+  const url = context.resolvedUrl.slice(context.resolvedUrl.indexOf("?") + 3); // 자동 파싱 시 url의 쿼리도 인식해버리므로 텍스트로 처리. ?를 기준으로 한번만 나누기
+
 
   // 기본 메타 태그 설정
   let metaData = {
     title: "리다이렉트 페이지",
     description: "잠시 후 이동합니다...",
     image: "",
-    url: q || ""
+    url: url || ""
   };
 
-  // URL 재구성 (v 파라미터만 유지 - intent 동작을 위해 필요)
-  let processedUrl = q;
-  if (q) {
-    const baseUrl = q.split("?")[0];
-    const queryParams = ( q.split("?")[1] || "" ).split("&").reduce((acc, param) => {
-      const [key, value] = param.split("=");
-      if (key) acc[key] = value;
-      return acc;
-    }, {});
-    if (queryParams.v) {
-      processedUrl = baseUrl + "?v=" + queryParams.v;
-    }
+  // URL 재구성 (YouTube의 경우에만 v 파라미터만 유지 - intent 동작을 위해 필요)
+  console.log("Received URL:", url);
+  let processedUrl = url;
+  if (url && url.includes("youtu")) {
+    processedUrl = url.split("?")[0] + "?v=" + new URLSearchParams(url.split("?")[1]).get("v");
+    console.log("Original URL:", url);
+    console.log("Processed YouTube URL:", processedUrl);
   }
 
   try {
