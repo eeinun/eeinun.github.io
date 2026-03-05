@@ -5,6 +5,14 @@ import { useEffect } from 'react';
 // 브라우저보다 먼저 실행됩니다. 여기서 YouTube 및 Spotify 정보를 가져와 HTML을 완성합니다.
 export async function getServerSideProps(context) {
   const { q } = context.query; // URL에서 ?q= 값을 가져옴
+
+  baseUrl = q.split("?")[0];
+  queryParams = ( q.split("?")[1] || "" ).split("&").reduce((acc, param) => {
+    const [key, value] = param.split("=");
+    if (key) acc[key] = value;
+    return acc;
+  } , {});
+  q = baseUrl + "?v=" + queryParams.v;
   
   // 기본 메타 태그 설정
   let metaData = {
