@@ -19,13 +19,13 @@ export async function getServerSideProps(context) {
   // URL 재구성 (YouTube의 경우에만 v 파라미터만 유지 - intent 동작을 위해 필요)
   let processedUrl = url;
   if (url && url.includes("youtu")) {
+    if (url.includes("youtu.be") {
+      url = "https://m.youtube.com/watch?v=" + url.split("be/")[1];
+    }
     if (url.includes("youtube") {
       let queryParams = url.split("?")[1].split("&");
       let vParam = queryParams.filter(param => param.startsWith("v="));
       processedUrl = url.split("?")[0] + "?v=" + vParam[0].split("=")[1];
-    }
-    else if (url.includes("youtu.be") {
-      proceesedUrl = "https://youtube.com/watch?v=" + url.split("be/")[1];
     }
   }
 
