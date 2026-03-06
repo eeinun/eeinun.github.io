@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 // 브라우저보다 먼저 실행됩니다. 여기서 YouTube 및 Spotify 정보를 가져와 HTML을 완성합니다.
 export async function getServerSideProps(context) {
   // 자동 파싱 시 url의 쿼리도 인식해버리므로 텍스트로 처리. ?를 기준으로 한번만 나누기
-  const url =  decodeURIComponent(String(context.resolvedUrl.slice(context.resolvedUrl.indexOf("?") + 3))); 
+  let url =  decodeURIComponent(String(context.resolvedUrl.slice(context.resolvedUrl.indexOf("?") + 3))); 
 
 
   // 기본 메타 태그 설정
