@@ -92,7 +92,7 @@ export default function Home({ metaData, targetUrl }) {
         window.location.href = target.replace('https://', 'intent://') + "&app=desktop#Intent;package=com.google.android.youtube;scheme=vnd.youtube;end";
     }
     else if (target.includes("spotify")) {
-        window.location.href = "https://spotify.app.link/?product=open&$full_url=" + target;
+        window.location.href = `http://158.180.69.57/spotify/share/?q=${target}`
     }
     else if (target.includes("nicovideo")) {
         // 스크린샷의 정보를 그대로 담은 코드
